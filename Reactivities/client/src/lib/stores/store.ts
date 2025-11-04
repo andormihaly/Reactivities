@@ -1,12 +1,16 @@
 import { createContext } from "react";
 import CounterStore from "./counterStore";
+import { UiStore } from "./UiStore";
+
 
 interface Store{
-    counterStore:CounterStore
+    counterStore:CounterStore,
+    uiStore:UiStore
 }
 
 export const store:Store={
-    counterStore:new CounterStore()
+    counterStore:new CounterStore(),
+    uiStore: new UiStore()
 }
 
-export const StoreContext = createContext(store);
+export const StoreContext = createContext<{ counterStore: CounterStore, uiStore:UiStore }>(store);
