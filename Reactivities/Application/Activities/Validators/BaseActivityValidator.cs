@@ -29,7 +29,7 @@ public class BaseActivityValidator<T,TDto>:AbstractValidator<T> where TDto: Base
 
         RuleFor(x => selector(x).Venue)
         .NotEmpty().WithMessage("Description is required!")
-        .MaximumLength(100).WithMessage("Venue must not exceeds 100 char");
+        .MaximumLength(500).WithMessage("Venue must not exceeds 100 char");
 
         RuleFor(x => selector(x).Latitude)
         .NotEmpty().WithMessage("Latitude is required!")
