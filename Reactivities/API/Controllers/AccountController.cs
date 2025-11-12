@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-public class AcountController(SignInManager<User> signInManager) : BaseApiController
+public class AccountController(SignInManager<User> signInManager) : BaseApiController
 {
     [AllowAnonymous]
     [HttpPost("register")]
@@ -33,4 +33,32 @@ public class AcountController(SignInManager<User> signInManager) : BaseApiContro
 
         return ValidationProblem();
     }
+    [AllowAnonymous]
+    [HttpGet("user-info")]
+    public async Task<IActionResult> GetUserInfo()
+    {
+        if (User.Identity.IsAuthenticated == false)
+        {
+            return NoContent();
+        }
+
+        var user = await signInManager.UserManager.GetUserAsync(User);
+
+        return Ok(new
+        {
+            user.DisplayName,
+            user.Email,
+            user.Id,
+            user.ImageUrl
+        });
+    }
+
+    [HttpPost("logout")]
+     public async Task<IActionResult> LogOut()
+    {
+        await signInManager.SignOutAsync();
+
+        return NoContent();
+    }
+
 }
