@@ -3,24 +3,27 @@ import agent from "../api/agent";
 import { useLocation } from "react-router";
 import { useAccount } from "./useAccount";
 
-export const useActivities = (id?:string) => {
+
+export const useActivities = (id?: string) => {
   const queryClient = useQueryClient();
   const location = useLocation();
-  const {currentUser} = useAccount();
-  
+  const { currentUser } = useAccount();
+
   const { data: activities, isLoading } = useQuery({
     queryKey: ['activities'],
     queryFn: async () => {
       const response = await agent.get<Activity[]>("/activities");
       return response.data;
     },
-    enabled:!id && location.pathname==='/activities' && !!currentUser,
-    select:data=>{
-      return data.map(activity=>{return {
-        ...activity,
-        isHost:currentUser?.id===activity.hostId,
-        isGoing:activity.attendees.some(x=>x.id===currentUser?.id)
-      }})
+    enabled: !id && location.pathname === '/activities' && !!currentUser,
+    select: data => {
+      return data.map(activity => {
+        return {
+          ...activity,
+          isHost: currentUser?.id === activity.hostId,
+          isGoing: activity.attendees.some(x => x.id === currentUser?.id)
+        }
+      })
     }
   })
 
@@ -58,19 +61,19 @@ export const useActivities = (id?:string) => {
     }
   })
 
-  const { data: activity, isLoading:isLoadingActivity } = useQuery({
-    queryKey: ['activities',id],
+  const { data: activity, isLoading: isLoadingActivity } = useQuery({
+    queryKey: ['activities', id],
     queryFn: async () => {
       const response = await agent.get<Activity>(`/activities/${id}`);
       return response.data;
     },
-    
+
     enabled: !!id && !!currentUser,
-    select:data=>{
+    select: data => {
       return {
         ...data,
-           isHost:currentUser?.id===data.hostId,
-        isGoing:data.attendees.some(x=>x.id===currentUser?.id),
+        isHost: currentUser?.id === data.hostId,
+        isGoing: data.attendees.some(x => x.id === currentUser?.id),
       }
     }
   })
@@ -79,10 +82,42 @@ export const useActivities = (id?:string) => {
     mutationFn: async (id: string) => {
       await agent.post(`/activities/${id}/attend`)
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ['activities',id]
-      })
+    onMutate: async (activityId: string) => {
+
+      await queryClient.cancelQueries({ queryKey: ['activities', activityId] });
+
+      const prevActivity = queryClient.getQueryData<Activity>(['activities', activityId]);
+
+      queryClient.setQueryData<Activity>(['activities', activityId], oldActivity => {
+        if (!oldActivity || !currentUser) {
+          return oldActivity;
+        }
+        const isHost = oldActivity.hostId === currentUser.id;
+        const isAttending = oldActivity.attendees.some(x => x.id === currentUser.id);
+
+        return {
+          ...oldActivity,
+          isCancelled: isHost ? !oldActivity.isCancelled : oldActivity.isCancelled,
+          attendees: isAttending
+            ? isHost
+              ? oldActivity.attendees
+              : oldActivity.attendees.filter(x => x.id !== currentUser.id)
+            : [...oldActivity.attendees,
+            {
+              id: currentUser.id,
+              displayName: currentUser.displayName,
+              imageUrl: currentUser.imageurl
+            }
+            ]
+        }
+      });
+      return { prevActivity }
+
+    },
+    onError: (error, activityId, context) => {
+      if (context?.prevActivity) {
+        queryClient.setQueryData(['activities', activityId], context.prevActivity)
+      }
     }
   })
 
