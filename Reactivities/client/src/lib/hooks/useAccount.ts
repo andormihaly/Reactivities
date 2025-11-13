@@ -55,7 +55,9 @@ export const useAccount=()=>{
             return response.data;
 
         },
-        enabled :!queryClient.getQueryData(['user']) &&(location.pathname!=='/login')&&(location.pathname!=='/register')
+        enabled :!queryClient.getQueryData(['user']) &&
+        //(location.pathname!=='/login') && ezt valamiert nem szereti
+        (location.pathname!=='/register')
     })
     return {
         loginUser,

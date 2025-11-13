@@ -14,7 +14,14 @@ export const useActivities = (id?:string) => {
       const response = await agent.get<Activity[]>("/activities");
       return response.data;
     },
-    enabled:!id && location.pathname==='/activities' && !!currentUser
+    enabled:!id && location.pathname==='/activities' && !!currentUser,
+    select:data=>{
+      return data.map(activity=>{return {
+        ...activity,
+        isHost:currentUser?.id===activity.hostId,
+        isGoing:activity.attendees.some(x=>x.id===currentUser?.id)
+      }})
+    }
   })
 
   const updateActivity = useMutation({
@@ -58,7 +65,25 @@ export const useActivities = (id?:string) => {
       return response.data;
     },
     
-    enabled: !!id && !!currentUser
+    enabled: !!id && !!currentUser,
+    select:data=>{
+      return {
+        ...data,
+           isHost:currentUser?.id===data.hostId,
+        isGoing:data.attendees.some(x=>x.id===currentUser?.id),
+      }
+    }
+  })
+
+  const updateAttendence = useMutation({
+    mutationFn: async (id: string) => {
+      await agent.post(`/activities/${id}/attend`)
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ['activities',id]
+      })
+    }
   })
 
   return {
@@ -68,6 +93,7 @@ export const useActivities = (id?:string) => {
     createActivity,
     deleteActivity,
     activity,
-    isLoadingActivity
+    isLoadingActivity,
+    updateAttendence
   }
 }

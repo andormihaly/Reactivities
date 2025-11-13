@@ -1,7 +1,6 @@
 import { CalendarToday, Info, Place } from "@mui/icons-material";
 import { Box, Button, Divider, Grid, Paper, Typography } from "@mui/material";
 import { formatDate } from "../../../../lib/util/util";
-import type { Activity } from "../../../../lib/types";
 import { useState } from "react";
 import MapComponent from "../../../../app/shared/components/MapComponent";
 type Props = {
@@ -43,6 +42,7 @@ export default function ActivityDetailsInfo({activity}:Props) {
                     </Typography>
                     <Button
                      onClick={()=>setMapOpen(!mapOpen)}
+                     sx={{whiteSpace:'nowrap',mx:2}}
                      >
                         {mapOpen ? 'Hide map' : 'Show map'}
                      </Button>
