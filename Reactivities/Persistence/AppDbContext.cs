@@ -10,6 +10,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     public required DbSet<Activity> Activities { get; set; }
     public required DbSet<ActivityAttendee> ActivityAttendees { get; set; }
 
+     public required DbSet<Photo> Photos { get; set; }
+
     override protected void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
