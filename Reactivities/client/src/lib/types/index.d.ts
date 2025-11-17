@@ -30,6 +30,16 @@ type User = {
     imageUrl?: string
     
 }
+
+type ChatComment = {
+    id: string
+    userId : string
+    body: string
+    displayName: string
+    imageUrl?: string
+    createdAt: Date
+}
+
 type Photo ={
   id:string
   url:string
