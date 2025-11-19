@@ -45,7 +45,9 @@ export default function ActivityForm() {
    
    console.log(data);
    const{location,...rest}=data;
-   const flattenedData={...rest,...location}
+   const flattenedData={...rest,...location,
+    date: data.date ? new Date(data.date) : new Date()
+   }
     try {
       if (activity)
       {
