@@ -18,12 +18,12 @@ agent.interceptors.response.use(config => {
 
 agent.interceptors.response.use(
     async response => {
-        await sleep(100);
+        await sleep(500);
         store.uiStore.isIdle();
         return response;
     },
     async error => {
-        await sleep(100);
+        await sleep(500);
         store.uiStore.isIdle();
 
         const { status, data } = error.response;
