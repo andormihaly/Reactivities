@@ -9,6 +9,31 @@ services:
     volumes:
       - sql-data:/var/opt/mssql
     platform: "linux/amd64"
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/1433"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    
+  backend:
+    image: reactapi:latest
+    container_name: reactapibackend
+    environment:
+      ASPNETCORE_URLS: "http://0.0.0.0:5001"
+      ConnectionStrings__DefaultConnection: "Server=sql;Database=reactivities;User Id=sa;Password=Str0ngP@ss!2025;TrustServerCertificate=True;"
+    ports:
+      - "5001:5001"
+    depends_on:
+      sql:
+        condition: service_healthy
+  frontend:
+    image: reactapp:latest
+    ports:
+      - "3000:80"
+    container_name: reactappfrontend
+    depends_on:
+      - backend
+
 
 volumes:
   sql-data:
