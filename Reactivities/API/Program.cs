@@ -66,6 +66,13 @@ builder.Services.AddAuthorization(opt =>
 builder.Services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
 
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+
+//var credential = new Azure.Identity.DefaultAzureCredential();
+
+builder.Configuration.AddAzureKeyVault(
+    new Uri("https://andorskv.vault.azure.net/"),
+    new Azure.Identity.DefaultAzureCredential()
+);
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionMiddleware>();
