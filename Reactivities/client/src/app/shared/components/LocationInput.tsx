@@ -22,7 +22,7 @@ export default function LocationInput<T extends FieldValues>(props:Props<T>) {
         }
     },[field.value])
 
-    const locationUrl='https://api.locationiq.com/v1/autocomplete?key=pk.32db09b635a59505ab5dd356b2dd11b4&limit=5&dedupe=1&';
+    const locationUrl='https://api.locationiq.com/v1/autocomplete?key=************4&limit=5&dedupe=1&';
     
     const fetchSuggestions = useMemo(
 
